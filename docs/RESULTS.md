@@ -25,3 +25,16 @@ Not yet measured: the same scenario undocked, which would isolate the DP retry l
 ## Negative results
 
 - 2026-10-15: no DRM vblank events queued or delivered in 4 s at idle (screen on, apps open), so the display mailbox rate (~480/s) is not driven by compositor page flips. Do not chase compositor repaints for that line; test DCP housekeeping and refresh rate instead.
+
+## 2026-10-15 refresh rate: 120 Hz vs 60 Hz (alternating A/B, `powerlab`, 30 to 40 s medians, battery discharging, docked, charger connected)
+
+| Brightness | 120 Hz | 60 Hz | Difference |
+| --- | --- | --- | --- |
+| 500/500 (it had been reset to full) | 18.59 W, 19.11 W | 17.35 W, 17.15 W | about -1.7 W (-9%) |
+| 105/500 (21%) | 13.35 W, 12.86 W | 11.43 W, 10.86 W | about -2.0 W (-15%) |
+
+Order was 120, 60, 120, 60 each time; the difference exceeds the spread between repeats (about 0.3 to 0.5 W at the median).
+Caveats: the 21% runs had p90 spikes (29.7 W once) from other activity; apps were open; only one machine. The
+display mode switch does not reset brightness (checked: stayed 105), but something reset it to 500 between 14:27 and
+14:38 and also after the reboot: open question.
+Tool: `tuning/refresh-rate/` (opt-in; 60 Hz on battery, 120 Hz on AC, configurable, `--status`, `--once`).

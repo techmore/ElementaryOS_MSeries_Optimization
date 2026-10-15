@@ -1,0 +1,39 @@
+{
+  "n": 30,
+  "median_w": 10.855,
+  "p10_w": 9.741,
+  "p90_w": 12.703,
+  "mean_w": 11.139,
+  "min_w": 9.555,
+  "max_w": 17.045,
+  "status": "Discharging",
+  "top_irqs": [
+    {
+      "irq": "36 Level arch_timer",
+      "per_s": 3895
+    },
+    {
+      "irq": "IPI1 call interrupts",
+      "per_s": 2546
+    },
+    {
+      "irq": "152 Level b01f00000.nhi-rxring0",
+      "per_s": 1240
+    },
+    {
+      "irq": "140 Level b01f00000.nhi-txring0",
+      "per_s": 1240
+    },
+    {
+      "irq": "IPI0 Rescheduling interrupts",
+      "per_s": 432
+    },
+    {
+      "irq": "91 Level 38bc08000.mbox-recv",
+      "per_s": 239
+    }
+  ],
+  "label": "refresh21-60",
+  "kernel": "7.1.13-elementary-fairydust-usb4-dptunnel",
+  "time": "2026-10-15T14:41:23-0400"
+}

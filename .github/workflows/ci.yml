@@ -8,6 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: python3 -m unittest powerlab.test_sample
+      - run: python3 tuning/refresh-rate/test_refresh.py
   rust:
     runs-on: ubuntu-24.04-arm
     if: ${{ hashFiles('rust/Cargo.toml') != '' }}

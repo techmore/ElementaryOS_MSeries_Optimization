@@ -29,3 +29,29 @@ tests below are done.
 ## Method for each row
 
 Alternate off/on three times with `powerlab`, compare medians, log in `RESULTS.md`.
+
+## Kernel work items at idle (tracefs `workqueue:workqueue_execute_start`, 4 s, 2026-10-15)
+
+Screen on, apps open (including the Claude desktop app being used), Dell dock attached, kernel `...-usb4-dptunnel`.
+Total **41,560 work items (about 10,400/s)**; tracing itself adds some. By function:
+
+| Function | Items | Per s | Owner |
+| --- | --- | --- | --- |
+| `ring_work` | 10,067 | 2,500 | Thunderbolt/USB4 NHI rings (the DP retry loop) |
+| Asahi `workqueue::SubmittedWorkContainer` | 9,134 | 2,300 | Asahi GPU driver (Rust): GPU job submission |
+| `drm_sched_run_job_work` | 7,132 | 1,800 | DRM scheduler: running GPU jobs |
+| `tb_cfg_request_work` | 5,044 | 1,260 | Thunderbolt config requests (DP retry loop) |
+| `apple_rtkit_rx_work` | 3,347 | 840 | Apple coprocessor (RTKit) mailbox receive |
+| `drm_sched_free_job_work` | 2,599 | 650 | DRM scheduler: freeing GPU jobs |
+| `wq_barrier_func`, `usb_giveback_urb_bh`, `commit_work`, `kcryptd_crypt`, btrfs | under 1,200 each | | misc |
+
+Grouped: **GPU job scheduling about 18,800 (45%)**, **USB4/Thunderbolt about 15,100 (36%)**, coprocessor mailbox ~3,300 (8%).
+Scheduler wakeups by task over 5 s: 67,862 total; top kworkers, then `claude-desktop` 5,265, `VizCompositorTh` 2,357 and
+`Compositor` 2,016 (Chromium/Electron GPU compositing), `gala` 1,795, `gh` 1,758, `mi-scavenger` 1,574.
+
+Reading: at "idle" the GPU is being handed about 1,800 jobs a second, almost certainly by Chromium/Electron apps
+compositing at 120 Hz plus Gala; this lines up with the 2 W saved by halving the refresh rate. The dock retry loop
+is the other third of kernel activity. Both are targets: (1) A/B with Electron apps closed or with GPU
+compositing/background throttling flags, and with 60 Hz; (2) docked vs undocked. Running kernel is also built with
+`CONFIG_HZ=1000` (and `NO_HZ_FULL`); 250 Hz is the usual laptop choice; a kernel decision for the owner.
+Caveat: the measurement session itself drives the Claude app, which inflates the app and GPU lines.

@@ -6,7 +6,7 @@
 
 | Profile | What it does | Measured effect |
 | --- | --- | --- |
-| `battery` | idle speaker sink suspends after 30 s; power profile `power-saver`; with `--display` 60 Hz | about -1.2 W (audio), about -2 W (60 Hz) |
+| `battery` | idle speaker sink suspends after 30 s; power profile `power-saver`; with `--display` 60 Hz | about -1.2 W (audio, low confidence), about -2 W (60 Hz); `power-saver` alone measured -0.10 W (noise) |
 | `balanced` | undoes the above | back to defaults |
 | `burst -- CMD` | switches to `balanced` while CMD runs, then restores the previous profile (a hold is impossible here) | see the gap below |
 

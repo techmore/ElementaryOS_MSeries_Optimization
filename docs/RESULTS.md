@@ -149,3 +149,18 @@ Takeaway: services and sensor pollers are not where the watts are. Both fast-pai
 the owner is running (Brave, the Claude app, the Terminal with OpenCode, Gala), which moved total power between 14 and 24 W within an hour.
 Next candidates (non-display, non-kernel): our own panel indicators' update rates, Electron/Chromium flags in a test profile, and the
 active-app mix; the display levers are deferred to profiles and dynamic refresh by the owner's decision (2026-10-15).
+
+## 2026-10-15 power-profiles-daemon: power-saver vs balanced (charger connected, fast pairs, 10 x 12 s)
+
+ON-OFF median -0.10 W (iqr 0.74; lower in 5/10 rounds); OFF 17.63 W, ON 17.35 W: not distinguishable from noise. On this system the
+`power-saver` profile by itself does not change whole-machine power (on AC); the battery CPU cap in `mseries-power` is a separate,
+still unmeasured-on-battery lever.
+
+## Where the measured levers add up (estimate, not a measurement)
+
+Typical light-use draw today with the owner's apps open is about 17 W at 325/500 brightness and 120 Hz. Measured separately:
+60 Hz about -2 W; brightness 325 -> 105 about -4 W (from the 500 -> 105 runs; interpolated); idle speaker sink suspend about -1.2 W (low confidence);
+H.264 route for web video about -1.5 W while playing; everything else tested (services, sensor polling, our indicators and daemons,
+PCIe/USB/Bluetooth, power-saver, idle governor) under 0.3 W. Applying them together would put today's light use near 10 to 11 W,
+still about 2.5x Apple's implied 4.1 W (video) and 1.7x its 6.4 W (web), with the agent apps open. Getting closer needs the kernel
+items (DeepSeek) and a leaner app mix, then a measured run.

@@ -1,0 +1,1 @@
+{"manifest_version":3,"name":"mseries H.264 only","version":"0.1","description":"Makes YouTube choose H.264 so the Apple Silicon hardware decoder is used.","content_scripts":[{"matches":["https://www.youtube.com/*","https://m.youtube.com/*","https://www.youtube-nocookie.com/*"],"js":["h264only.js"],"run_at":"document_start","all_frames":true,"world":"MAIN"}]}

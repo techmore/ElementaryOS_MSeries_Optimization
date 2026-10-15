@@ -116,3 +116,19 @@ present (the dock was unplugged). Redo with the SMC sensor.
 
 The panel watt meter (main repo `panel-power-watts.patch`) now reads the same sensor, so it no longer disappears at the
 charge limit (it hid below 0.1 W when only battery flow was shown).
+
+## 2026-10-15 YouTube with and without H.264 forcing (SMC whole-machine power, charger connected)
+
+Brightness 325/500, 120 Hz, agent UIs running, Big Buck Bunny, 30 s warm-up then 60 s median.
+
+| Variant | Median | p10 / p90 | Decoder interrupts / 60 s |
+| --- | --- | --- | --- |
+| Stock Brave, fresh profile | 19.27 W | 18.1 / 21.2 | 3,065 |
+| + own MV3 extension hiding VP9/AV1 (`browser/h264only`) | 18.52 W | 18.1 / 20.3 | 7,216 |
+| + extension + `AcceleratedVideoDecodeLinuxGL,VaapiIgnoreDriverChecks` | 17.72 W | 17.3 / 18.9 | 7,258 |
+
+H.264 forcing plus VA-API saves about **1.5 W (8%)** against stock. The bigger point: the same machine idles at about
+14 to 15.5 W (SMC sensor, `sys2-base*`, same brightness) with the agent UIs open, so video adds only about 2 to 4 W on top of
+the floor. Apple's 4.1 W for video is a whole-machine number; reaching it needs the floor to fall, not the decoder to improve.
+Floor contributors still to remove: display brightness/refresh, agent-UI GPU traffic, and the dock/kernel items (owner of the
+kernel work: DeepSeek). Conclusion unchanged: **not at parity**.

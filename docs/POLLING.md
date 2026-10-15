@@ -64,3 +64,11 @@ Caveat: the measurement session itself drives the Claude app, which inflates the
 counters (`drm-*` in fdinfo) are not exposed by this driver, so the tracepoint is the way to attribute. The measuring
 session itself drives the Claude app, so this is an upper bound for a quiet desktop. A fair lean-profile number needs
 those UIs closed: run `powerlab/lean-test.sh --yes` yourself (owner-triggered; it opens one fullscreen video).
+
+## Our own additions are negligible (tracepoints, 10 s, 2026-10-16 16:3x, owner's Brave busy)
+
+GPU jobs queued: 12,216 (about 1,220/s) by submitter: `brave` 8,630 (70.6%), `claude-desktop` 2,435 (19.9%), `gala` 779 (6.4%),
+`io.elementary.terminal` 342 (2.8%), **Wingpanel 30 (0.2%)**. Scheduler wakeups: 102,843 (about 10,300/s) and **zero** from
+`mseries-*`, `netusage`, the brightness bridge, the keyboard-backlight service, the audio watchdog and `mseries-docked-lid`.
+So the panel network/watt/ETA indicators and our daemons are not a power problem; an active browser tab (here about 860 GPU jobs/s)
+is the largest single source, then the Claude app. Earlier idle sample (agent UIs only): Claude 55%, Terminal 27%, Gala 18%.

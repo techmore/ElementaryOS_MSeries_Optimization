@@ -1,0 +1,39 @@
+{
+  "n": 90,
+  "median_w": 18.532,
+  "p10_w": 13.299,
+  "p90_w": 28.547,
+  "mean_w": 19.585,
+  "min_w": 13.094,
+  "max_w": 37.32,
+  "status": "Discharging",
+  "top_irqs": [
+    {
+      "irq": "IPI1 call interrupts",
+      "per_s": 10124
+    },
+    {
+      "irq": "36 Level arch_timer",
+      "per_s": 6378
+    },
+    {
+      "irq": "IPI0 Rescheduling interrupts",
+      "per_s": 1183
+    },
+    {
+      "irq": "122 Level 39b10c000.spi",
+      "per_s": 821
+    },
+    {
+      "irq": "118 Level 39b400000.dma-controller",
+      "per_s": 732
+    },
+    {
+      "irq": "137 Edge brcmf_pcie_intr",
+      "per_s": 426
+    }
+  ],
+  "label": "mpv-sw-1080p30",
+  "kernel": "7.1.13-elementary-fairydust-usb4-dptunnel",
+  "time": "2026-10-15T15:05:34-0400"
+}

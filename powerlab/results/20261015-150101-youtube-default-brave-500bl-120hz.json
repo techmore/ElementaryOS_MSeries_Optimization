@@ -1,0 +1,39 @@
+{
+  "n": 90,
+  "median_w": 18.837,
+  "p10_w": 16.613,
+  "p90_w": 20.664,
+  "mean_w": 18.69,
+  "min_w": 15.657,
+  "max_w": 26.872,
+  "status": "Discharging",
+  "top_irqs": [
+    {
+      "irq": "36 Level arch_timer",
+      "per_s": 5066
+    },
+    {
+      "irq": "IPI1 call interrupts",
+      "per_s": 4921
+    },
+    {
+      "irq": "IPI0 Rescheduling interrupts",
+      "per_s": 1473
+    },
+    {
+      "irq": "118 Level 39b400000.dma-controller",
+      "per_s": 797
+    },
+    {
+      "irq": "122 Level 39b10c000.spi",
+      "per_s": 485
+    },
+    {
+      "irq": "58 Level 406408000.mbox-recv",
+      "per_s": 481
+    }
+  ],
+  "label": "youtube-default-brave-500bl-120hz",
+  "kernel": "7.1.13-elementary-fairydust-usb4-dptunnel",
+  "time": "2026-10-15T15:01:01-0400"
+}

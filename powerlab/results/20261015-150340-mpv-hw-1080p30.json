@@ -1,0 +1,39 @@
+{
+  "n": 90,
+  "median_w": 13.226,
+  "p10_w": 13.052,
+  "p90_w": 13.628,
+  "mean_w": 13.396,
+  "min_w": 12.953,
+  "max_w": 16.934,
+  "status": "Discharging",
+  "top_irqs": [
+    {
+      "irq": "36 Level arch_timer",
+      "per_s": 2515
+    },
+    {
+      "irq": "IPI1 call interrupts",
+      "per_s": 2277
+    },
+    {
+      "irq": "118 Level 39b400000.dma-controller",
+      "per_s": 732
+    },
+    {
+      "irq": "IPI0 Rescheduling interrupts",
+      "per_s": 262
+    },
+    {
+      "irq": "91 Level 38bc08000.mbox-recv",
+      "per_s": 120
+    },
+    {
+      "irq": "58 Level 406408000.mbox-recv",
+      "per_s": 77
+    }
+  ],
+  "label": "mpv-hw-1080p30",
+  "kernel": "7.1.13-elementary-fairydust-usb4-dptunnel",
+  "time": "2026-10-15T15:03:40-0400"
+}

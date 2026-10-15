@@ -65,3 +65,28 @@ versus Apple's implied 4.1 W (video) and 6.4 W (web). **Not at parity.**
 - Reduce GPU job submission (about 1,800/s at idle) from Chromium/Electron apps (flags, fewer open apps).
 - Kernel: `CONFIG_HZ` 1000 -> 250; back off the DP tunnel retries; deep idle (CPU PD) entry rate.
 - Video playback test (YouTube 1080p in Brave with VA-API) to be run only with the owner's agreement, since it uses the screen.
+
+## 2026-10-15 video playback (display settings left as the owner had them: 120 Hz, brightness varied)
+
+Battery 64.3 Wh full (`energy_full`). Hours = 64.3 / watts. Apple's published figure for video is 17 h on 70 Wh (about 4.1 W).
+
+| Test | Brightness | Median | p10 / p90 | Hardware decoder used | Hours on a full battery |
+| --- | --- | --- | --- | --- | --- |
+| YouTube, stock Brave, fresh profile (auto quality, VP9/AV1 expected) | 500/500 | 18.84 W | 16.6 / 20.7 | no (AVD interrupts 0) | about 3.4 h |
+| Local 1080p30 H.264 in mpv, `--hwdec=vaapi`, fullscreen, muted | 325/500 | 13.23 W | 13.1 / 13.6 | yes (5,402 AVD interrupts in 90 s) | about 4.9 h |
+| Same file, `--hwdec=no` (software) | 325/500 | 18.53 W | 13.3 / 28.6 | no | about 3.5 h |
+
+Findings: the Asahi hardware decoder works from mpv and saves about **5.3 W** against software decode of the same clip.
+Stock Brave on YouTube does not use it (YouTube serves VP9/AV1, which this decoder does not handle), so web video costs
+about as much as software decode. Not comparable with Apple's number: brightness and refresh rate were not matched
+(Apple's test uses moderate brightness; ours ran at 65% and 100%, at 120 Hz). The synthetic test clip is higher-bitrate
+than typical video, which makes both decode numbers pessimistic. Rough estimate only (not measured): at 60 Hz (about -2 W)
+and moderate brightness the hardware-decode case might reach about 8 to 9 W, roughly 7 to 8 h: about half of Apple's 17 h.
+**Not at parity.**
+
+## Levers identified for video, in order of expected size
+
+1. Hardware decode in the browser: make YouTube serve H.264 (extension/user-agent policy) or add VP9 decode in the kernel driver; then confirm AVD interrupts during playback.
+2. 60 Hz (about -2 W) and moderate brightness.
+3. Remove the idle GPU job traffic and dock retry loop (about 80% of kernel work items at idle).
+4. Kernel tick 1000 Hz -> 250 Hz; deeper CPU idle.

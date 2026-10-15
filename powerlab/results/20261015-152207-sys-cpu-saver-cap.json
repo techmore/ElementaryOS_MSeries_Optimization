@@ -1,0 +1,39 @@
+{
+  "n": 30,
+  "median_w": 0.0,
+  "p10_w": 0.0,
+  "p90_w": 0.0,
+  "mean_w": 0.0,
+  "min_w": 0.0,
+  "max_w": 0.0,
+  "status": "Not charging",
+  "top_irqs": [
+    {
+      "irq": "36 Level arch_timer",
+      "per_s": 3061
+    },
+    {
+      "irq": "IPI1 call interrupts",
+      "per_s": 2001
+    },
+    {
+      "irq": "IPI0 Rescheduling interrupts",
+      "per_s": 718
+    },
+    {
+      "irq": "91 Level 38bc08000.mbox-recv",
+      "per_s": 480
+    },
+    {
+      "irq": "58 Level 406408000.mbox-recv",
+      "per_s": 361
+    },
+    {
+      "irq": "122 Level 39b10c000.spi",
+      "per_s": 75
+    }
+  ],
+  "label": "sys-cpu-saver-cap",
+  "kernel": "7.1.13-elementary-fairydust-usb4-dptunnel",
+  "time": "2026-10-15T15:22:07-0400"
+}

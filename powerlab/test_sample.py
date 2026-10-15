@@ -13,6 +13,20 @@ class SampleTests(unittest.TestCase):
         self.assertGreater(result['mean_w'], 13)
         self.assertEqual(result['max_w'], 24)
 
+    def test_prefers_smc_total_system_power(self):
+        with tempfile.TemporaryDirectory() as directory:
+            hw = Path(directory) / 'hwmon3'
+            hw.mkdir()
+            (hw / 'name').write_text('macsmc_hwmon\n')
+            (hw / 'power1_label').write_text('Total System Power\n')
+            (hw / 'power1_input').write_text('8250000\n')
+            sample.HWMON = Path(directory)
+            found = sample.find_system_power()
+            self.assertEqual(found, hw / 'power1_input')
+            self.assertEqual(sample.read_watts(found), 8.25)
+            sample.HWMON = Path(directory) / 'none'
+            self.assertIsNone(sample.find_system_power())
+
     def test_run_with_fake_battery_and_interrupts(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -20,7 +34,7 @@ class SampleTests(unittest.TestCase):
             (root / 'status').write_text('Discharging\n')
             irq = root / 'interrupts'
             irq.write_text('CPU0 CPU1\n 1: 10 20 Level foo\n')
-            sample.BATTERY, sample.INTERRUPTS = root, irq
+            sample.BATTERY, sample.INTERRUPTS, sample.HWMON = root, irq, root / 'no-hwmon'
             ticks = iter(range(0, 100))
             calls = []
 

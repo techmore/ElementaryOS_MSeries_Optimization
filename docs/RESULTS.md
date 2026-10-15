@@ -101,3 +101,18 @@ and moderate brightness the hardware-decode case might reach about 8 to 9 W, rou
 | `thunderbolt.dprx_timeout` | `-1` on this machine (wait forever, deliberate for the dock work), polled every 76 ms |
 
 Proposed fix for the retry cost: `kernel/0001-thunderbolt-dprx-poll-backoff.patch` (unbuilt, unmeasured).
+
+## 2026-10-15 better power source: SMC "Total System Power"
+
+`/sys/class/hwmon/hwmon*/` (chip `macsmc_hwmon`) exposes `power1` "Total System Power", `power2` "AC Input Power",
+`power3` "3.8 V Rail Power" and `power4` "Heatpipe Power". `powerlab/sample.py` now uses Total System Power when present
+(falls back to battery flow), so measurements are valid on the charger as well as on battery; the JSON records
+`source`. Earlier results in this file used battery `power_now`, which equals whole-machine draw only while discharging.
+Spot check: 15.96 W median (10 s, AC, brightness 325/500, 120 Hz, agent UIs running).
+
+Void: the 2026-10-15 "system levers" run (ASPM, USB autosuspend, CPU cap, Bluetooth) was discarded: the battery was
+"Not charging" at the 80% limit with the charger connected (readings were not total power) and no USB devices were
+present (the dock was unplugged). Redo with the SMC sensor.
+
+The panel watt meter (main repo `panel-power-watts.patch`) now reads the same sensor, so it no longer disappears at the
+charge limit (it hid below 0.1 W when only battery flow was shown).

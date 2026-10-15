@@ -1,0 +1,39 @@
+{
+  "n": 30,
+  "median_w": 0.0,
+  "p10_w": 0.0,
+  "p90_w": 0.0,
+  "mean_w": 0.0,
+  "min_w": 0.0,
+  "max_w": 0.0,
+  "status": "Not charging",
+  "top_irqs": [
+    {
+      "irq": "36 Level arch_timer",
+      "per_s": 2953
+    },
+    {
+      "irq": "IPI1 call interrupts",
+      "per_s": 1986
+    },
+    {
+      "irq": "IPI0 Rescheduling interrupts",
+      "per_s": 680
+    },
+    {
+      "irq": "91 Level 38bc08000.mbox-recv",
+      "per_s": 480
+    },
+    {
+      "irq": "58 Level 406408000.mbox-recv",
+      "per_s": 351
+    },
+    {
+      "irq": "137 Edge brcmf_pcie_intr",
+      "per_s": 66
+    }
+  ],
+  "label": "sys-base3",
+  "kernel": "7.1.13-elementary-fairydust-usb4-dptunnel",
+  "time": "2026-10-15T15:21:33-0400"
+}

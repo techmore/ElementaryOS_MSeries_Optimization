@@ -19,10 +19,28 @@ INTERRUPTS = Path(os.environ.get('POWERLAB_INTERRUPTS', '/proc/interrupts'))
 RESULTS = Path(__file__).resolve().parent / 'results'
 
 
-def read_watts():
-    """Battery power in watts, positive while discharging (power_now is negative then on this driver)."""
-    microwatts = int((BATTERY / 'power_now').read_text())
-    return abs(microwatts) / 1e6
+HWMON = Path(os.environ.get('POWERLAB_HWMON', '/sys/class/hwmon'))
+
+
+def find_system_power():
+    """Path of the SMC's 'Total System Power' sensor (whole machine, valid on battery and on AC), or None."""
+    for chip in sorted(HWMON.glob('hwmon*')):
+        try:
+            if (chip / 'name').read_text().strip() != 'macsmc_hwmon':
+                continue
+            for label in sorted(chip.glob('power*_label')):
+                if label.read_text().strip() == 'Total System Power':
+                    return chip / label.name.replace('_label', '_input')
+        except OSError:
+            continue
+    return None
+
+
+def read_watts(system=None):
+    """Whole-machine power in watts when the SMC sensor exists, else battery flow (positive while discharging)."""
+    if system is not None:
+        return int(system.read_text()) / 1e6
+    return abs(int((BATTERY / 'power_now').read_text())) / 1e6
 
 
 def interrupt_totals():
@@ -60,15 +78,16 @@ def top_rates(before, after, seconds, limit=6):
 
 
 def run(seconds, interval=1.0, sleep=time.sleep, clock=time.monotonic):
+    system = find_system_power()
     status = (BATTERY / 'status').read_text().strip() if (BATTERY / 'status').exists() else 'unknown'
     before = interrupt_totals()
     start, samples = clock(), []
     while clock() - start < seconds:
         sleep(interval)
-        samples.append(read_watts())
+        samples.append(read_watts(system))
     elapsed = max(clock() - start, 1e-9)
     result = summarize(samples)
-    result.update({'status': status, 'top_irqs': top_rates(before, interrupt_totals(), elapsed)})
+    result.update({'source': 'smc-total-system-power' if system else 'battery-power-now', 'status': status, 'top_irqs': top_rates(before, interrupt_totals(), elapsed)})
     return result
 
 
@@ -80,10 +99,10 @@ def main():
     args = parser.parse_args()
     result = run(args.seconds)
     result.update({'label': args.label, 'kernel': platform.release(), 'time': time.strftime('%Y-%m-%dT%H:%M:%S%z')})
-    if result['status'] != 'Discharging':
+    if result['source'] == 'battery-power-now' and result['status'] != 'Discharging':
         print('WARNING: battery status is %s, not Discharging; the reading is not a battery-power measurement.' % result['status'])
-    print('%s: median %.2f W  p10 %.2f  p90 %.2f  (n=%d, %s)' % (
-        args.label, result['median_w'], result['p10_w'], result['p90_w'], result['n'], result['status']))
+    print('%s: median %.2f W  p10 %.2f  p90 %.2f  (n=%d, %s, %s)' % (
+        args.label, result['median_w'], result['p10_w'], result['p90_w'], result['n'], result['source'], result['status']))
     for item in result['top_irqs']:
         print('  %7d/s  %s' % (item['per_s'], item['irq']))
     if args.save:

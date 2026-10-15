@@ -55,3 +55,12 @@ is the other third of kernel activity. Both are targets: (1) A/B with Electron a
 compositing/background throttling flags, and with 60 Hz; (2) docked vs undocked. Running kernel is also built with
 `CONFIG_HZ=1000` (and `NO_HZ_FULL`); 250 Hz is the usual laptop choice; a kernel decision for the owner.
 Caveat: the measurement session itself drives the Claude app, which inflates the app and GPU lines.
+
+## Who feeds the GPU at idle (tracepoint `gpu_scheduler:drm_sched_job_queue`, 4 s, 2026-10-15)
+
+2,662 jobs queued (about 665/s), counted by the submitting process:
+`claude-desktop` 1,461 (55%), `io.elementary.terminal` 720 (27%; it hosts an OpenCode TUI session, itself 13% CPU),
+`gala` 481 (18%). The agent interfaces we use to work are the largest source of idle GPU traffic. Per-process GPU
+counters (`drm-*` in fdinfo) are not exposed by this driver, so the tracepoint is the way to attribute. The measuring
+session itself drives the Claude app, so this is an upper bound for a quiet desktop. A fair lean-profile number needs
+those UIs closed: run `powerlab/lean-test.sh --yes` yourself (owner-triggered; it opens one fullscreen video).

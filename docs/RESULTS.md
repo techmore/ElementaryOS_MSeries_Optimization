@@ -141,6 +141,11 @@ could be resolved. Rerun with fast paired alternation (`powerlab/ab.py`, 10 roun
 | Lever | ON - OFF median | Verdict |
 | --- | --- | --- |
 | Ambient-light pollers off (`iio-sensor-proxy` + `mseries-keyboard-backlight`) | -0.06 W (iqr 0.33; lower in 7/10 rounds); OFF 16.98 W, ON 16.90 W | Not distinguishable from noise |
-| Idle background daemons off (see next entry) | pending | |
+| Idle background daemons off (avahi, cups, cups-browsed, geoclue, parental-controls, zeitgeist x2, evolution x3, gsd Sharing/Smartcard/PrintNotifications/UsbProtection, obex, mpris-proxy) | -0.05 W (iqr 5.06 W; lower in 5/10 rounds); OFF 24.31 W, ON 23.99 W | Not distinguishable from noise; the machine was at about 24 W because the owner's Brave was busy |
 
 Skipped on purpose: `incus`/`lxcfs` (two containers, `orchard-test` and `rupert-dev`, are running), `colord` (display colour), `chrony`, `bluetooth` (-0.2 W earlier, keep).
+
+Takeaway: services and sensor pollers are not where the watts are. Both fast-paired tests came out under 0.1 W. The floor is set by what
+the owner is running (Brave, the Claude app, the Terminal with OpenCode, Gala), which moved total power between 14 and 24 W within an hour.
+Next candidates (non-display, non-kernel): our own panel indicators' update rates, Electron/Chromium flags in a test profile, and the
+active-app mix; the display levers are deferred to profiles and dynamic refresh by the owner's decision (2026-10-15).

@@ -30,3 +30,14 @@ Candidates: `CONFIG_HZ_250=y` and `CONFIG_NO_HZ_IDLE=y`. Expected to reduce time
 - Idle governor: `teo` is **worse** than `menu` here: +0.8 W (15.41/15.70 W vs 14.96/14.61 W) and about 4x fewer deep-idle
   entries. Keep `menu`.
 - CPU hotplug (`cpuN/online`) is not writable on this kernel, so "fewer cores" cannot be tested at runtime.
+
+## Blocker for building the patch (2026-10-15)
+
+The exact source and config of the running `7.1.13-elementary-fairydust-usb4-dptunnel` kernel (build string `#dp1`, 12 Oct 2026)
+are not on the M1 Pro: there is no `/boot/config-*`, no `/lib/modules/*/build`, no source tree under the home directory, and
+`techmore/linux-m1pro-touchid` branch `asahi` ends at 20 Aug 2026 (`77cb8f2`), so it is not obviously the base of the
+12 Oct build. Missing build tools: `flex`, `bison`, `clang`, `bindgen`, `pahole` (the config enables Rust modules; rustc 1.99 is present).
+The repo's `mseries/fairydust/debian/build.sh` builds the older pinned AsahiLinux `ce9f2eb` + USB4 patch, not the DP-tunnel work.
+
+Needed from the owner before a build is worth starting: the branch/commit and `.config` used for the `dptunnel` kernel, and a go-ahead to
+run a low-priority build (about 6.5 GB source, tens of GB of build space, an hour or more of CPU). Install and boot stay owner-only.

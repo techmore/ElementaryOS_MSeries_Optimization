@@ -38,3 +38,30 @@ Caveats: the 21% runs had p90 spikes (29.7 W once) from other activity; apps wer
 display mode switch does not reset brightness (checked: stayed 105), but something reset it to 500 between 14:27 and
 14:38 and also after the reboot: open question.
 Tool: `tuning/refresh-rate/` (opt-in; 60 Hz on battery, 120 Hz on AC, configurable, `--status`, `--once`).
+
+## 2026-10-15 lever tests (60 Hz base, battery discharging, docked; medians of 30 s runs)
+
+Method note: these tests changed the owner's screen and upset them; no further display tests without asking.
+The baseline itself drifted 9.6 to 11.0 W between runs, so only repeated, alternated pairs count.
+
+| Lever | Result | Verdict |
+| --- | --- | --- |
+| 60 Hz vs 120 Hz (earlier) | -2.0 W at 21%, -1.7 W at full brightness | Real, repeated |
+| Brightness 21% -> 11% -> 5% | 9.63/9.60 W -> 9.05/9.10 W -> 8.89 W | Real but small: about -0.7 W from 21% to 5% |
+| 48 Hz vs 60 Hz | 10.07 W vs neighbouring bases 11.03 and 10.49 W | Inconclusive (maybe -0.4 to -1 W); needs a clean repeat |
+| Bluetooth off | 10.19 W vs bases 10.98 and 9.72 W | Inconclusive |
+| CPUs 4-9 offline | not possible: writes to `cpuN/online` are denied on this kernel | No data |
+| Display off (DPMS), 30 s | median 9.72 W but p10 6.27 W, p90 15.5 W | Too noisy; suggests non-display floor near 6 W with apps running |
+| Keyboard backlight | already 0 in daylight | Spent |
+
+Other: the first 11% reading (16.8 W) and a later 14.3 W/14.6 W reading were transient spikes, not effects.
+Current best realistic profile with everything above: about 9 to 10 W in light use at 60 Hz and low brightness,
+versus Apple's implied 4.1 W (video) and 6.4 W (web). **Not at parity.**
+
+## Next, without touching the screen
+
+- Dynamic refresh: the screen mode switch blanks briefly; true variable refresh (Mutter `variable-refresh-rate`
+  experimental feature, DCP support unverified) would ramp without a modeset. Investigate read-only first, then ask.
+- Reduce GPU job submission (about 1,800/s at idle) from Chromium/Electron apps (flags, fewer open apps).
+- Kernel: `CONFIG_HZ` 1000 -> 250; back off the DP tunnel retries; deep idle (CPU PD) entry rate.
+- Video playback test (YouTube 1080p in Brave with VA-API) to be run only with the owner's agreement, since it uses the screen.

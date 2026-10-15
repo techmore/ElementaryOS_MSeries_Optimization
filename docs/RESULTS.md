@@ -12,3 +12,12 @@
   `39b10c000.spi` 228 to 1000/s depending on touch. Gala 11 to 18% CPU idle.
 - Wi-Fi power save is on; schedutil governor; cpuidle exposes only WFI and CPU PD states.
 - Battery: 63.7 Wh full vs 69.3 Wh design (92% health).
+
+## 2026-10-15 baselines (kernel 7.1.13-elementary-fairydust-usb4-dptunnel, Dell dock attached, charger connected, battery above the 80% limit so it was discharging)
+
+| Scenario | Median | p10 / p90 | Notes |
+| --- | --- | --- | --- |
+| Brightness 500/500 after reboot, 8 s smoke run | 19.2 W | 19.0 / 20.4 | Not comparable; screen at full brightness |
+| Brightness 105/500, apps open, 60 s (`baseline-20pct-apps-open`) | 13.6 W | 12.7 / 16.2 | Includes the DP tunnel retry loop (see `POLLING.md`) |
+
+Not yet measured: the same scenario undocked, which would isolate the DP retry loop's cost.

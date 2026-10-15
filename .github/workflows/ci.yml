@@ -1,0 +1,17 @@
+name: CI
+on:
+  push:
+  pull_request:
+jobs:
+  powerlab:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m unittest powerlab.test_sample
+  rust:
+    runs-on: ubuntu-24.04-arm
+    if: ${{ hashFiles('rust/Cargo.toml') != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: cargo test --manifest-path rust/Cargo.toml --locked
+      - run: cargo clippy --manifest-path rust/Cargo.toml --locked -- -D warnings

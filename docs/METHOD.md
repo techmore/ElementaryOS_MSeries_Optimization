@@ -11,3 +11,10 @@
 
 Scenarios: idle screen off; idle at 20% brightness; local 1080p video in Brave; scripted browsing; CPU burst;
 local-AI prompt.
+
+## Fast paired alternation (`powerlab/ab.py`) — use this when load drifts
+
+Long A/B windows break down when your own apps change the load: on 2026-10-15 baselines wandered between 14 and 24 W in an
+hour, bigger than any single lever. `ab.py` instead alternates OFF/ON in short windows (12 s) for 10 rounds and reports the
+median of the paired differences, their spread, and how many rounds went each way. A lever counts only if the median
+difference exceeds the spread and at least 8 of 10 rounds agree. Examples in `docs/RESULTS.md`.

@@ -51,3 +51,23 @@ class SampleTests(unittest.TestCase):
 
 if __name__ == '__main__':
     unittest.main()
+
+
+class PairedTests(unittest.TestCase):
+    def test_paired_difference_cancels_drift(self):
+        from powerlab import ab
+        state = {'on': False, 'drift': 0.0}
+        calls = []
+
+        def run(cmd):
+            calls.append(cmd)
+            state['on'] = cmd == 'ON'
+
+        def measure(_):
+            state['drift'] += 0.5                      # slow upward drift every window
+            return 10 + state['drift'] - (1.0 if state['on'] else 0.0)
+
+        r = ab.paired(6, 1, 'ON', 'OFF', settle=0, measure_fn=measure, run=run)
+        self.assertEqual(calls[-1], 'OFF')             # always restored
+        self.assertLess(r['median_diff_w'], 0)
+        self.assertEqual(r['lower'], 6)

@@ -132,3 +132,15 @@ H.264 forcing plus VA-API saves about **1.5 W (8%)** against stock. The bigger p
 the floor. Apple's 4.1 W for video is a whole-machine number; reaching it needs the floor to fall, not the decoder to improve.
 Floor contributors still to remove: display brightness/refresh, agent-UI GPU traffic, and the dock/kernel items (owner of the
 kernel work: DeepSeek). Conclusion unchanged: **not at parity**.
+
+## 2026-10-15 services and sensors (non-display, non-kernel levers), whole-machine power
+
+Slow A/B (30 s windows) was void: baselines drifted 14 to 24 W with the owner's activity and a reboot, so no service group
+could be resolved. Rerun with fast paired alternation (`powerlab/ab.py`, 10 rounds x 12 s):
+
+| Lever | ON - OFF median | Verdict |
+| --- | --- | --- |
+| Ambient-light pollers off (`iio-sensor-proxy` + `mseries-keyboard-backlight`) | -0.06 W (iqr 0.33; lower in 7/10 rounds); OFF 16.98 W, ON 16.90 W | Not distinguishable from noise |
+| Idle background daemons off (see next entry) | pending | |
+
+Skipped on purpose: `incus`/`lxcfs` (two containers, `orchard-test` and `rupert-dev`, are running), `colord` (display colour), `chrony`, `bluetooth` (-0.2 W earlier, keep).

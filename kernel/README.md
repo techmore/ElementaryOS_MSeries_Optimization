@@ -1,4 +1,10 @@
-# Kernel and scheduler proposals (not applied; the kernel and boot chain belong to the owner)
+# Kernel and scheduler notes (reference only; the kernel feature set is DeepSeek's)
+
+> **Ownership (2026-10-15):** DeepSeek, another agent, owns the kernel feature set (fairydust, AVD/USB4/dock-video
+> patches) of `techmore/ElementaryOS_MSeries`. Claude does not build, patch or install kernels, and changes no bootloader
+> or m1n1 files. Everything here is measurement and context for that owner, posted as
+> [a comment on issue #46](https://github.com/techmore/ElementaryOS_MSeries/issues/46#issuecomment-6201042382).
+> The patch file is an untested sketch offered as reference, not a request.
 
 Source of truth for the running kernel: `techmore/linux-m1pro-touchid`, branch `asahi`
 (running `7.1.13-elementary-fairydust-usb4-dptunnel`). Nothing here has been built or booted by this repo.
@@ -31,13 +37,7 @@ Candidates: `CONFIG_HZ_250=y` and `CONFIG_NO_HZ_IDLE=y`. Expected to reduce time
   entries. Keep `menu`.
 - CPU hotplug (`cpuN/online`) is not writable on this kernel, so "fewer cores" cannot be tested at runtime.
 
-## Blocker for building the patch (2026-10-15)
+## Build status
 
-The exact source and config of the running `7.1.13-elementary-fairydust-usb4-dptunnel` kernel (build string `#dp1`, 12 Oct 2026)
-are not on the M1 Pro: there is no `/boot/config-*`, no `/lib/modules/*/build`, no source tree under the home directory, and
-`techmore/linux-m1pro-touchid` branch `asahi` ends at 20 Aug 2026 (`77cb8f2`), so it is not obviously the base of the
-12 Oct build. Missing build tools: `flex`, `bison`, `clang`, `bindgen`, `pahole` (the config enables Rust modules; rustc 1.99 is present).
-The repo's `mseries/fairydust/debian/build.sh` builds the older pinned AsahiLinux `ce9f2eb` + USB4 patch, not the DP-tunnel work.
-
-Needed from the owner before a build is worth starting: the branch/commit and `.config` used for the `dptunnel` kernel, and a go-ahead to
-run a low-priority build (about 6.5 GB source, tens of GB of build space, an hour or more of CPU). Install and boot stay owner-only.
+Not built, and not going to be built by this repo's author: see the ownership note above. The earlier request for the dptunnel
+branch/commit and `.config` is withdrawn.

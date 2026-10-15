@@ -21,3 +21,7 @@
 | Brightness 105/500, apps open, 60 s (`baseline-20pct-apps-open`) | 13.6 W | 12.7 / 16.2 | Includes the DP tunnel retry loop (see `POLLING.md`) |
 
 Not yet measured: the same scenario undocked, which would isolate the DP retry loop's cost.
+
+## Negative results
+
+- 2026-10-15: no DRM vblank events queued or delivered in 4 s at idle (screen on, apps open), so the display mailbox rate (~480/s) is not driven by compositor page flips. Do not chase compositor repaints for that line; test DCP housekeeping and refresh rate instead.

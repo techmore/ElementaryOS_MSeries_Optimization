@@ -90,3 +90,14 @@ and moderate brightness the hardware-decode case might reach about 8 to 9 W, rou
 2. 60 Hz (about -2 W) and moderate brightness.
 3. Remove the idle GPU job traffic and dock retry loop (about 80% of kernel work items at idle).
 4. Kernel tick 1000 Hz -> 250 Hz; deeper CPU idle.
+
+## 2026-10-15 scheduler and idle (no display changes)
+
+| Test | Result |
+| --- | --- |
+| Idle governor `menu` vs `teo`, alternated twice, 40 s medians | menu 14.96 / 14.61 W; teo 15.41 / 15.70 W: **teo +0.8 W**, deep-idle (CPU PD) entries 19,877 / 14,557 (menu) vs 4,789 / 2,732 (teo). Keep menu |
+| CPU frequency ramp from a lowered state | P-cluster reached 90% of 3,036 MHz in 76 to 79 ms; fast enough |
+| Kernel work items at idle | 41,560 in 4 s: GPU scheduling 45%, USB4 DP retry loop 36% (see `POLLING.md`) |
+| `thunderbolt.dprx_timeout` | `-1` on this machine (wait forever, deliberate for the dock work), polled every 76 ms |
+
+Proposed fix for the retry cost: `kernel/0001-thunderbolt-dprx-poll-backoff.patch` (unbuilt, unmeasured).

@@ -1,0 +1,53 @@
+diff --git a/drivers/thunderbolt/tunnel.c b/drivers/thunderbolt/tunnel.c
+index f38f775..09bb2a8 100644
+--- a/drivers/thunderbolt/tunnel.c
++++ b/drivers/thunderbolt/tunnel.c
+@@ -81,6 +81,7 @@
+ #define TB_DPRX_TIMEOUT			12000
+ #define TB_DPRX_WAIT_TIMEOUT		25
+ #define TB_DPRX_POLL_DELAY		50
++#define TB_DPRX_POLL_DELAY_MAX		1000
+ 
+ static int dprx_timeout = TB_DPRX_TIMEOUT;
+ module_param(dprx_timeout, int, 0444);
+@@ -1060,8 +1061,19 @@ static void tb_dp_dprx_work(struct work_struct *work)
+ 		if (tb_dp_is_usb4(tunnel->src_port->sw) &&
+ 		    tb_dp_wait_dprx(tunnel, TB_DPRX_WAIT_TIMEOUT)) {
+ 			if (ktime_before(ktime_get(), tunnel->dprx_timeout)) {
++				/*
++				 * Back off while the sink is not ready: poll every
++				 * TB_DPRX_POLL_DELAY ms at first, doubling up to
++				 * TB_DPRX_POLL_DELAY_MAX. With dprx_timeout=-1 this keeps
++				 * waiting forever but wakes up ~13x less often.
++				 */
++				unsigned int delay = min_t(unsigned int,
++						TB_DPRX_POLL_DELAY << min(tunnel->dprx_polls, 5U),
++						TB_DPRX_POLL_DELAY_MAX);
++
++				tunnel->dprx_polls++;
+ 				queue_delayed_work(tb->wq, &tunnel->dprx_work,
+-						   msecs_to_jiffies(TB_DPRX_POLL_DELAY));
++						   msecs_to_jiffies(delay));
+ 				mutex_unlock(&tb->lock);
+ 				return;
+ 			}
+@@ -1088,6 +1100,7 @@ static int tb_dp_dprx_start(struct tb_tunnel *tunnel)
+ 
+ 	if (tunnel->callback) {
+ 		tunnel->dprx_timeout = dprx_timeout_to_ktime(dprx_timeout);
++		tunnel->dprx_polls = 0;
+ 		queue_delayed_work(tunnel->tb->wq, &tunnel->dprx_work, 0);
+ 		return -EINPROGRESS;
+ 	}
+diff --git a/drivers/thunderbolt/tunnel.h b/drivers/thunderbolt/tunnel.h
+index 4878763..d8f0c78 100644
+--- a/drivers/thunderbolt/tunnel.h
++++ b/drivers/thunderbolt/tunnel.h
+@@ -104,6 +104,7 @@ struct tb_tunnel {
+ 	bool dprx_canceled;
+ 	ktime_t dprx_timeout;
+ 	struct delayed_work dprx_work;
++	unsigned int dprx_polls;
+ 	void (*callback)(struct tb_tunnel *tunnel, void *data);
+ 	void *callback_data;
+ 

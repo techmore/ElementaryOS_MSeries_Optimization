@@ -1,0 +1,39 @@
+{
+  "n": 40,
+  "median_w": 14.613,
+  "p10_w": 14.507,
+  "p90_w": 15.499,
+  "mean_w": 14.905,
+  "min_w": 14.431,
+  "max_w": 19.146,
+  "status": "Discharging",
+  "top_irqs": [
+    {
+      "irq": "36 Level arch_timer",
+      "per_s": 3125
+    },
+    {
+      "irq": "IPI1 call interrupts",
+      "per_s": 2303
+    },
+    {
+      "irq": "IPI0 Rescheduling interrupts",
+      "per_s": 662
+    },
+    {
+      "irq": "91 Level 38bc08000.mbox-recv",
+      "per_s": 480
+    },
+    {
+      "irq": "58 Level 406408000.mbox-recv",
+      "per_s": 349
+    },
+    {
+      "irq": "100 Level nvme-apple",
+      "per_s": 87
+    }
+  ],
+  "label": "idlegov-menu",
+  "kernel": "7.1.13-elementary-fairydust-usb4-dptunnel",
+  "time": "2026-10-15T15:09:01-0400"
+}

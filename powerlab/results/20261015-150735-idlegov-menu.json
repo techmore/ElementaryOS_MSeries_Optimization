@@ -1,0 +1,39 @@
+{
+  "n": 40,
+  "median_w": 14.962,
+  "p10_w": 14.569,
+  "p90_w": 16.304,
+  "mean_w": 15.183,
+  "min_w": 14.422,
+  "max_w": 17.876,
+  "status": "Discharging",
+  "top_irqs": [
+    {
+      "irq": "36 Level arch_timer",
+      "per_s": 3313
+    },
+    {
+      "irq": "IPI1 call interrupts",
+      "per_s": 2233
+    },
+    {
+      "irq": "IPI0 Rescheduling interrupts",
+      "per_s": 809
+    },
+    {
+      "irq": "118 Level 39b400000.dma-controller",
+      "per_s": 548
+    },
+    {
+      "irq": "91 Level 38bc08000.mbox-recv",
+      "per_s": 479
+    },
+    {
+      "irq": "58 Level 406408000.mbox-recv",
+      "per_s": 348
+    }
+  ],
+  "label": "idlegov-menu",
+  "kernel": "7.1.13-elementary-fairydust-usb4-dptunnel",
+  "time": "2026-10-15T15:07:35-0400"
+}

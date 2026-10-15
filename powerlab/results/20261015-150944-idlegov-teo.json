@@ -1,0 +1,39 @@
+{
+  "n": 40,
+  "median_w": 15.702,
+  "p10_w": 14.971,
+  "p90_w": 16.178,
+  "mean_w": 15.644,
+  "min_w": 14.59,
+  "max_w": 16.38,
+  "status": "Discharging",
+  "top_irqs": [
+    {
+      "irq": "36 Level arch_timer",
+      "per_s": 8714
+    },
+    {
+      "irq": "IPI1 call interrupts",
+      "per_s": 1604
+    },
+    {
+      "irq": "IPI0 Rescheduling interrupts",
+      "per_s": 697
+    },
+    {
+      "irq": "91 Level 38bc08000.mbox-recv",
+      "per_s": 480
+    },
+    {
+      "irq": "58 Level 406408000.mbox-recv",
+      "per_s": 347
+    },
+    {
+      "irq": "137 Edge brcmf_pcie_intr",
+      "per_s": 80
+    }
+  ],
+  "label": "idlegov-teo",
+  "kernel": "7.1.13-elementary-fairydust-usb4-dptunnel",
+  "time": "2026-10-15T15:09:44-0400"
+}

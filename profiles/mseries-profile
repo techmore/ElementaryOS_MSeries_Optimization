@@ -1,0 +1,92 @@
+#!/usr/bin/env python3
+"""mseries-profile: apply measured power levers as one named profile. Dry run by default.
+
+  mseries-profile battery            show what the battery profile would do (nothing changes)
+  mseries-profile battery --apply    do it
+  mseries-profile balanced --apply   put everything back to defaults
+  mseries-profile burst -- CMD...    run CMD with the balanced power profile held, then release it
+                                     (no 'performance' profile exists here; the battery CPU cap is not lifted)
+  add --display to include the visible refresh-rate change (60 Hz on battery / 120 Hz on AC); never done otherwise
+
+Levers are only those measured in docs/RESULTS.md. It never touches brightness, the kernel, the bootloader,
+the speaker-safety daemon or the charge limit. Needs no root.
+"""
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+WP_DIR = Path.home() / '.config/wireplumber/wireplumber.conf.d'
+WP_FILE = WP_DIR / '50-mseries-asahi-no-suspend.conf'
+WP_TEXT = '''# mseries-profile: idle speaker sink suspends after 30 s instead of never (measured about -1.2 W).
+monitor.alsa.rules = [
+  {
+    matches = [
+      { api.alsa.path = "~hw:AppleJ[0-9][0-9][0-9],[01]", media.class = "Audio/Sink" }
+    ]
+    actions = { update-props = { session.suspend-timeout-seconds = 30 } }
+  }
+]
+'''
+REFRESH = Path.home() / '.local/libexec/mseries-refresh'
+
+
+def plan(profile, display=False):
+    """Return a list of (description, action) where action is ('run', argv) or ('write', path, text) or ('remove', path)."""
+    steps = []
+    if profile == 'battery':
+        steps.append(('Idle speaker sink suspends after 30 s (about -1.2 W)', ('write', WP_FILE, WP_TEXT)))
+        steps.append(('Restart WirePlumber to load it', ('run', ['systemctl', '--user', 'restart', 'wireplumber'])))
+        steps.append(('Power profile: power-saver', ('run', ['powerprofilesctl', 'set', 'power-saver'])))
+        if display:
+            steps.append(('Panel to 60 Hz on battery (about -2 W; VISIBLE)', ('run', [str(REFRESH), '--once'])))
+    elif profile == 'balanced':
+        steps.append(('Remove the 30 s sink override', ('remove', WP_FILE)))
+        steps.append(('Restart WirePlumber to load it', ('run', ['systemctl', '--user', 'restart', 'wireplumber'])))
+        steps.append(('Power profile: balanced', ('run', ['powerprofilesctl', 'set', 'balanced'])))
+        if display:
+            steps.append(('Panel back to the AC/default rate (VISIBLE)', ('run', [str(REFRESH), '--once'])))
+    else:
+        raise SystemExit('unknown profile: %s (battery, balanced, burst)' % profile)
+    return steps
+
+
+def execute(steps, apply):
+    for description, action in steps:
+        print(('  ' if apply else '  [dry run] ') + description)
+        if not apply:
+            continue
+        if action[0] == 'write':
+            action[1].parent.mkdir(parents=True, exist_ok=True)
+            action[1].write_text(action[2])
+        elif action[0] == 'remove':
+            action[1].unlink(missing_ok=True)
+        else:
+            subprocess.run(action[1], check=False)
+
+
+def main(argv):
+    if not argv or argv[0] in ('-h', '--help'):
+        print(__doc__)
+        return 0
+    profile, rest = argv[0], argv[1:]
+    if profile == 'burst':
+        command = rest[1:] if rest[:1] == ['--'] else rest
+        if not command:
+            print('usage: mseries-profile burst -- CMD...')
+            return 2
+        # This system's power-profiles-daemon offers only balanced and power-saver (no 'performance'), so a burst
+        # holds 'balanced'. On battery, mseries-power also caps CPU frequency directly (2064/2208 MHz); a held
+        # profile does not lift that cap, so on battery a burst is still capped until mseries-power follows the profile.
+        print('  holding the balanced power profile while %s runs' % command[0])
+        return subprocess.call(['powerprofilesctl', 'launch', '--profile', 'balanced', '--reason', 'mseries-profile burst'] + command)
+    steps = plan(profile, display='--display' in rest)
+    print('Profile %s:' % profile)
+    execute(steps, apply='--apply' in rest)
+    if '--apply' not in rest:
+        print('Nothing changed. Re-run with --apply to do this.')
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv[1:]))

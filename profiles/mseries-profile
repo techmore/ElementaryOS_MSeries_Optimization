@@ -4,7 +4,7 @@
   mseries-profile battery            show what the battery profile would do (nothing changes)
   mseries-profile battery --apply    do it
   mseries-profile balanced --apply   put everything back to defaults
-  mseries-profile burst -- CMD...    run CMD with the balanced power profile held, then release it
+  mseries-profile burst -- CMD...    run CMD with the balanced power profile active, then restore the previous one
                                      (no 'performance' profile exists here; the battery CPU cap is not lifted)
   add --display to include the visible refresh-rate change (60 Hz on battery / 120 Hz on AC); never done otherwise
 
@@ -75,11 +75,16 @@ def main(argv):
         if not command:
             print('usage: mseries-profile burst -- CMD...')
             return 2
-        # This system's power-profiles-daemon offers only balanced and power-saver (no 'performance'), so a burst
-        # holds 'balanced'. On battery, mseries-power also caps CPU frequency directly (2064/2208 MHz); a held
-        # profile does not lift that cap, so on battery a burst is still capped until mseries-power follows the profile.
-        print('  holding the balanced power profile while %s runs' % command[0])
-        return subprocess.call(['powerprofilesctl', 'launch', '--profile', 'balanced', '--reason', 'mseries-profile burst'] + command)
+        # power-profiles-daemon here has no 'performance' profile and only allows holds on 'performance' or
+        # 'power-saver', so a burst switches the active profile to 'balanced' for the command and restores the previous one.
+        # On battery, mseries-power also caps CPU frequency directly (2064/2208 MHz); that cap is not lifted by this.
+        previous = subprocess.run(['powerprofilesctl', 'get'], capture_output=True, text=True).stdout.strip() or 'balanced'
+        print('  profile %s -> balanced while %s runs' % (previous, command[0]))
+        subprocess.run(['powerprofilesctl', 'set', 'balanced'], check=False)
+        try:
+            return subprocess.call(command)
+        finally:
+            subprocess.run(['powerprofilesctl', 'set', previous], check=False)
     steps = plan(profile, display='--display' in rest)
     print('Profile %s:' % profile)
     execute(steps, apply='--apply' in rest)

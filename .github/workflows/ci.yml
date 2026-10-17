@@ -12,8 +12,11 @@ jobs:
       - run: python3 profiles/test_profile.py
   rust:
     runs-on: ubuntu-24.04-arm
-    if: ${{ hashFiles('rust/Cargo.toml') != '' }}
     steps:
       - uses: actions/checkout@v4
-      - run: cargo test --manifest-path rust/Cargo.toml --locked
-      - run: cargo clippy --manifest-path rust/Cargo.toml --locked -- -D warnings
+      - name: Cargo test
+        if: ${{ hashFiles('rust/Cargo.toml') != '' }}
+        run: cargo test --manifest-path rust/Cargo.toml --locked
+      - name: Cargo clippy
+        if: ${{ hashFiles('rust/Cargo.toml') != '' }}
+        run: cargo clippy --manifest-path rust/Cargo.toml --locked -- -D warnings

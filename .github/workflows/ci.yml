@@ -1,10 +1,24 @@
 name: CI
+# Run once per change: on pull requests, and on pushes to main.
+# Pushing to a PR branch used to start CI twice (push + pull_request), and every
+# techmore repo shares one account-wide concurrent job limit.
 on:
   push:
+    branches: [main]
+    paths-ignore: ['**.md', 'docs/**']
   pull_request:
+    paths-ignore: ['**.md', 'docs/**']
+  workflow_dispatch:
+
+# A newer push to the same PR cancels the older run; runs on main always finish.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   powerlab:
     runs-on: ubuntu-24.04
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - run: python3 -m unittest powerlab.test_sample
@@ -12,6 +26,7 @@ jobs:
       - run: python3 profiles/test_profile.py
   rust:
     runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - name: Cargo test
